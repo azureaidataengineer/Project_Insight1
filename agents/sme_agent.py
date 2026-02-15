@@ -52,4 +52,10 @@ def get_sme_app():
     graph = StateGraph(SMEState)
 
     graph.add_node("sme", sme_node)
-    graph.add_node("tools", ToolNode([get_schema,_]()_
+    graph.add_node("tools", ToolNode([get_schema, execute_sql]))
+
+    graph.add_edge(START, "sme")
+    graph.add_conditional_edges("sme", tools_condition)
+    graph.add_edge("tools", "sme")
+
+    return graph.compile()
