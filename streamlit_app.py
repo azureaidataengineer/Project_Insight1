@@ -137,7 +137,7 @@ if st.button("Run Analysis"):
 
                 st.success("Analysis Completed ✅")
 
-                st.subheader("SME Output")
+                st.subheader("Output")
                 st.write(sme_output)
 
             except Exception as e:
