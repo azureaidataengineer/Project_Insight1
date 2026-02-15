@@ -112,17 +112,35 @@ user_query = st.text_area(
 )
 
 if st.button("Run Analysis"):
+
     if not user_query.strip():
         st.warning("Please enter a question.")
     else:
-        with st.spinner("Running Auditor Agent..."):
+        with st.spinner("Running Analyst + SME Agents..."):
+
             try:
+                # 1️⃣ Analyst Agent
                 analyst_app = get_analyst_app()
-                result = analyst_app.invoke({
+                analyst_result = analyst_app.invoke({
                     "messages": [HumanMessage(content=user_query)]
                 })
-                st.success("Analysis completed")
-                st.write(result["messages"][-1].content)
+
+                analyst_output = analyst_result["messages"][-1]
+
+                # 2️⃣ SME Agent
+                sme_app = get_sme_app()
+                sme_result = sme_app.invoke({
+                    "messages": [analyst_output]
+                })
+
+                sme_output = sme_result["messages"][-1].content
+
+                st.success("Analysis Completed ✅")
+
+                st.subheader("SME Output")
+                st.write(sme_output)
+
             except Exception as e:
-                st.error("Agent failed ❌")
+                st.error("Pipeline Failed ❌")
                 st.exception(e)
+
