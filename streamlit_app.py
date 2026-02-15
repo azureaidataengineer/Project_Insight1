@@ -3,6 +3,7 @@ import base64
 from db.connection import get_db_connection
 from langchain_core.messages import HumanMessage
 from agents.analyst_agent import get_analyst_app
+from agents.sme_agent import get_sme_app
 
 # =====================================================
 # PAGE CONFIG
