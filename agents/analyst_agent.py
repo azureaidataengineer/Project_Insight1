@@ -21,7 +21,7 @@ def get_analyst_app():
     Creates and returns the Analyst Agent workflow.
     """
 
-    llm = ChatOpenAI(model="gpt-4o-mini")
+    llm = ChatOpenAI(model="gpt-4.1-nano")
 
     analyst_llm = llm.bind_tools([get_schema])
 
