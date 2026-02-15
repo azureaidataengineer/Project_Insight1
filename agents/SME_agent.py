@@ -1,25 +1,55 @@
-#SME agent
+# agents/sme_agent.py
 
-SME_llm = llm.bind_tools([get_schema, execute_sql])
+from typing import Annotated, TypedDict
 
-SME_system_message = [SystemMessage(content="""You are a data SME Agent.
-Use tools to answer the analyst's questions by querying the database.
-you do not have to summarize it. Later Refiner will do that.""")]
+from langgraph.graph import StateGraph, START
+from langgraph.graph.message import AnyMessage, add_messages
+from langgraph.prebuilt import ToolNode, tools_condition
+from langchain_core.messages import SystemMessage
+from langchain_openai import ChatOpenAI
+
+from tools.execute_sql import execute_sql
+from tools.get_schema import get_schema
+
+
+# ==============================
+# STATE
+# ==============================
 
 class SMEState(TypedDict):
-  messages: Annotated[list[AnyMessage], add_messages]
-
-def SME(state: SMEState) -> SMEState:
-  response = SME_llm.invoke(SME_system_message + state["messages"])
-  return {"messages": [response]}
+    messages: Annotated[list[AnyMessage], add_messages]
 
 
-SME_graph = StateGraph(SMEState)
-SME_graph.add_node("SME", SME)
-SME_graph.add_node("tools", ToolNode([get_schema, execute_sql]))
+# ==============================
+# SME AGENT
+# ==============================
 
-SME_graph.add_edge(START, "SME")
-SME_graph.add_conditional_edges("SME", tools_condition)
-SME_graph.add_edge("tools","SME")
+def get_sme_app():
+    """
+    Returns compiled SME agent graph
+    """
 
-SME_app = SME_graph.compile()
+    llm = ChatOpenAI(model="gpt-5-nano")
+
+    sme_llm = llm.bind_tools([get_schema, execute_sql])
+
+    system_message = [
+        SystemMessage(
+            content="""
+            You are a Data SME (Subject Matter Expert).
+            Answer the analyst’s questions using database tools.
+            Use get_schema first if needed.
+            Then use execute_sql to fetch data.
+            Do not summarize. Just provide detailed answers.
+            """
+        )
+    ]
+
+    def sme_node(state: SMEState) -> SMEState:
+        response = sme_llm.invoke(system_message + state["messages"])
+        return {"messages": [response]}
+
+    graph = StateGraph(SMEState)
+
+    graph.add_node("sme", sme_node)
+    graph.add_node("tools", ToolNode([get_schema,_]()_
