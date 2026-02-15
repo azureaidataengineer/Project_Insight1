@@ -28,9 +28,9 @@ def get_analyst_app():
     analyst_system_message = [
         SystemMessage(
             content=(
-                "You are a data analyst. Start by understanding the database schema "
-                "using tools. Then ask at least 10 insightful questions in a single "
-                "response that will help in creating a comprehensive report."
+                ""You are a data analyst. 
+                Understand the schema and generate only the necessary analytical steps 
+                required to answer the user's question concisely."
             )
         )
     ]
