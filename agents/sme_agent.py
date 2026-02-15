@@ -29,7 +29,7 @@ def get_sme_app():
     Returns compiled SME agent graph
     """
 
-    llm = ChatOpenAI(model="gpt-5-mini")
+    llm = ChatOpenAI(model="gpt-5-nano")
 
     sme_llm = llm.bind_tools([get_schema, execute_sql])
 
@@ -59,6 +59,7 @@ def get_sme_app():
     graph.add_edge("tools", "sme")
 
     return graph.compile()
+
 
 
 
